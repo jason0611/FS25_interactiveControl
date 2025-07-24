@@ -90,6 +90,8 @@ function InteractiveControl.registerEventListeners(vehicleType)
     SpecializationUtil.registerEventListener(vehicleType, "onRegisterActionEvents", InteractiveControl)
     SpecializationUtil.registerEventListener(vehicleType, "onRegisterAnimationValueTypes", InteractiveControl)
     SpecializationUtil.registerEventListener(vehicleType, "onUpdateAnimation", InteractiveControl)
+    SpecializationUtil.registerEventListener(vehicleType, "onEnterVehicle", InteractiveControl)
+    SpecializationUtil.registerEventListener(vehicleType, "onLeaveVehicle", InteractiveControl)
 end
 
 function InteractiveControl.registerOverwrittenFunctions(vehicleType)
@@ -105,7 +107,7 @@ function InteractiveControl:onPreLoad(savegame)
 
     if self[name] ~= nil then
         Logging.xmlError(self.xmlFile, "The vehicle specialization '%s' could not be added because variable '%s' already exists!", InteractiveControl.MOD_NAME, name)
-        self:setLoadingState(VehicleLoadingUtil.VEHICLE_LOAD_ERROR)
+        self:setLoadingState(VehicleLoadingState.ERROR)
     end
 
     local env = {}
@@ -172,6 +174,8 @@ function InteractiveControl:onPostLoad(savegame)
         SpecializationUtil.removeEventListener(self, "onDraw", InteractiveControl)
         SpecializationUtil.removeEventListener(self, "onRegisterActionEvents", InteractiveControl)
         SpecializationUtil.removeEventListener(self, "onUpdateAnimation", InteractiveControl)
+        SpecializationUtil.removeEventListener(self, "onEnterVehicle", InteractiveControl)
+        SpecializationUtil.removeEventListener(self, "onLeaveVehicle", InteractiveControl)
 
         return
     end
@@ -593,12 +597,34 @@ end
 function InteractiveControl:onUpdateAnimation(animationName)
     local spec = self.spec_interactiveControl
 
-    for _, interactiveController in pairs(spec.interactiveControllers) do
-        ---@cast interactiveController InteractiveController
-        interactiveController:updateAnimation(animationName)
+    if spec.interactiveControllers ~= nil then
+        for _, interactiveController in pairs(spec.interactiveControllers) do
+            ---@cast interactiveController InteractiveController
+            interactiveController:updateAnimation(animationName)
+        end
     end
 
     spec.indoorSoundModifierFactor = self:getMaxIndoorSoundModifier()
+end
+
+---Called on entering vehicle
+function InteractiveControl:onEnterVehicle()
+    local spec = self.spec_interactiveControl
+
+    for _, interactiveController in pairs(spec.interactiveControllers) do
+        ---@cast interactiveController InteractiveController
+        interactiveController:setHoverTimeout(3000)
+    end
+end
+
+---Called on leaving vehicle
+function InteractiveControl:onLeaveVehicle()
+    local spec = self.spec_interactiveControl
+
+    for _, interactiveController in pairs(spec.interactiveControllers) do
+        ---@cast interactiveController InteractiveController
+        interactiveController:setHoverTimeout(3000)
+    end
 end
 
 -------------------------------------------------- Interactive Trigger -------------------------------------------------
