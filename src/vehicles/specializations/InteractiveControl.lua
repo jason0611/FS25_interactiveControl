@@ -287,7 +287,7 @@ function InteractiveControl:onUpdateTick(dt, isActiveForInput, isActiveForInputI
     local isOutdoor = self:isOutdoorActive()
 
     -- shows a + sign when ic is active and noHud mod enabled, also outside near by the vehicle trigger (SbSh, GlowinsModschmiede)
-    if (g_currentMission.hud.controlledVehicle == nil or self == g_currentMission.hud.controlledVehicle) and not g_currentMission.hud:getIsVisible() and self:isIndoorActive() then
+    if (g_currentMission.hud.controlledVehicle == nil or self == g_currentMission.hud.controlledVehicle) and not g_currentMission.hud:getIsVisible() then --and self:isIndoorActive() then
         if spec.state == true then
             renderText(0.5, 0.5, 0.018, "+")
         end
